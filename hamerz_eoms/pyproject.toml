@@ -1,0 +1,19 @@
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "hamerz_eoms"
+authors = [
+    { name = "Solar Electric Energy Co. / Hamerz Plasma", email = "engineering@hamerzplasma.com" }
+]
+description = "Agile Project Operations & Engineering Quality Gates on Frappe/ERPNext v16"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    # "frappe"
+]
+
+[project.urls]
+Homepage = "https://hamerzplasma.com"

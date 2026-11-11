@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد تعاملی سامانه عملیات مهندسی هامرز (Hamerz EOMS v1.4.6)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Vazirmatn';
+      src: local('Vazirmatn'), local('B Nazanin'), local('Tahoma');
+    }
+    body {
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-6 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Header Bar -->
+  <header class="max-w-7xl mx-auto bg-slate-800/80 backdrop-blur border border-slate-700/80 rounded-2xl p-5 mb-6 shadow-xl">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-3 mb-1">
+          <span class="h-3.5 w-3.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">سامانه مدیریت عملیات مهندسی هامرز (Hamerz EOMS)</h1>
+          <span class="badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">نسخه v1.4.6</span>
+          <span class="badge bg-amber-500/20 text-amber-300 border border-amber-500/30">ISO 13485 Compliant</span>
+        </div>
+        <p class="text-slate-400 text-sm">
+          شرکت سولار الکتریک انرژی (سهامی خاص) | شهرک صنعتی نجف‌آباد ۲ | یکپارچه‌سازی فرآیندهای Linear با ERPNext
+        </p>
+      </div>
+
+      <!-- Flavor Switcher -->
+      <div class="flex items-center gap-2 bg-slate-900/80 p-1.5 rounded-xl border border-slate-700">
+        <span class="text-xs text-slate-400 px-2 font-medium">طعم مهندسی (Flavor):</span>
+        <button id="btnFlavorC" onclick="switchFlavor('C')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all shadow-sm">
+          قالب‌ها و ابزار دقیق (ساعت ماشین)
+        </button>
+        <button id="btnFlavorA" onclick="switchFlavor('A')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+          مصرفی پزشکی / پلاسما (استوری پوینت)
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Cycle Metrics Ribbon -->
+    <div class="mt-5 pt-4 border-t border-slate-700/70 grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+        <span class="text-xs text-slate-400 block mb-1">چرخه کاری جاری (Active Cycle)</span>
+        <span id="cycleName" class="text-sm font-bold text-emerald-400 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Cycle-2026-W45 (هفته ۴۵)
+        </span>
+      </div>
+
+      <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+        <span class="text-xs text-slate-400 block mb-1">ظرفیت متعهد (Frozen Baseline)</span>
+        <span id="baselineScope" class="text-sm font-bold text-white flex items-center gap-1.5">
+          🔒 ۴۰.۰ ساعت ماشین
+        </span>
+      </div>
+
+      <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+        <span class="text-xs text-slate-400 block mb-1">سرعت تکمیل‌شده (Velocity)</span>
+        <span id="completedVelocity" class="text-sm font-bold text-sky-400">
+          ۲۶.۰ ساعت (۶۵٪)
+        </span>
+      </div>
+
+      <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+        <span class="text-xs text-slate-400 block mb-1">سرریز ناخواسته (Scope Creep)</span>
+        <span id="scopeCreep" class="text-sm font-bold text-amber-400">
+          +۴.۰ ساعت (+۱۰٪)
+        </span>
+      </div>
+
+      <div class="col-span-2 md:col-span-1 flex items-center gap-2">
+        <button onclick="triggerRolloverSimulation()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+          <span>⚡</span>
+          <span>شبیه‌سازی رول‌اور شبانه</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Notice & Status Logs -->
+  <div class="max-w-7xl mx-auto mb-6">
+    <div id="statusToast" class="hidden p-4 rounded-xl text-sm font-medium border transition-all duration-300"></div>
+  </div>
+
+  <!-- Interactive Kanban Board -->
+  <main class="max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <h2 class="text-lg font-bold text-white">نمای تخته چرخه‌ای عملیات (Cycle Kanban Board)</h2>
+        <span class="text-xs text-slate-400 font-normal">روی هر تسک کلیک کنید تا جزئیات و گیت کنترل کیفیت آن را تست نمایید</span>
+      </div>
+      <button onclick="resetDemoData()" class="text-xs text-slate-400 hover:text-white underline">بازنشانی داده‌های نمونه</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+      <!-- Column 1: Unstarted -->
+      <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-4 flex flex-col">
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-700/50">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+            <span class="font-bold text-sm text-slate-200">شروع‌نشده (Unstarted)</span>
+          </div>
+          <span id="countUnstarted" class="text-xs bg-slate-700 px-2 py-0.5 rounded-full text-slate-300 font-bold">۱</span>
+        </div>
+        <div id="colUnstarted" class="space-y-3 flex-1 min-h-[300px]"></div>
+      </div>
+
+      <!-- Column 2: Started / In Progress -->
+      <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-4 flex flex-col">
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-700/50">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <span class="font-bold text-sm text-amber-200">در حال انجام (Started)</span>
+          </div>
+          <span id="countStarted" class="text-xs bg-slate-700 px-2 py-0.5 rounded-full text-slate-300 font-bold">۲</span>
+        </div>
+        <div id="colStarted" class="space-y-3 flex-1 min-h-[300px]"></div>
+      </div>
+
+      <!-- Column 3: QA Gate Pending -->
+      <div class="bg-slate-800/50 border border-purple-500/30 rounded-2xl p-4 flex flex-col bg-purple-950/10">
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-purple-500/20">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse"></span>
+            <span class="font-bold text-sm text-purple-200">گیت کنترل کیفیت (QA Gate)</span>
+          </div>
+          <span id="countQA" class="text-xs bg-purple-900/60 text-purple-200 px-2 py-0.5 rounded-full font-bold">۱</span>
+        </div>
+        <div id="colQA" class="space-y-3 flex-1 min-h-[300px]"></div>
+      </div>
+
+      <!-- Column 4: Completed -->
+      <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-4 flex flex-col">
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-700/50">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span class="font-bold text-sm text-emerald-200">تکمیل‌شده (Completed 🔒)</span>
+          </div>
+          <span id="countCompleted" class="text-xs bg-slate-700 px-2 py-0.5 rounded-full text-slate-300 font-bold">۲</span>
+        </div>
+        <div id="colCompleted" class="space-y-3 flex-1 min-h-[300px]"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Interactive Task Detail & QA Gate Modal -->
+  <div id="taskModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 max-w-2xl w-full rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+      <div class="flex items-start justify-between mb-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span id="modalTaskCategory" class="badge bg-indigo-500/20 text-indigo-300">Started</span>
+            <span id="modalTaskCode" class="text-xs font-mono text-slate-400">TASK-0104</span>
+            <span id="modalQAGateBadge" class="badge bg-purple-500/20 text-purple-300 border border-purple-500/30">دارای گیت QA</span>
+          </div>
+          <h3 id="modalTaskTitle" class="text-lg font-bold text-white">عملیات حرارتی مغزی قالب تزریق</h3>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl p-1">✕</button>
+      </div>
+
+      <!-- Task Meta Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs mb-5">
+        <div>
+          <span class="text-slate-400 block mb-0.5">تیم اجرایی</span>
+          <span id="modalTaskTeam" class="font-semibold text-white">تیم قالب‌سازی ۲</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block mb-0.5">وزن / ساعت کار</span>
+          <span id="modalTaskWeight" class="font-semibold text-white">۱۲.۰ ساعت ماشین</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block mb-0.5">شمارنده رول‌اور</span>
+          <span id="modalTaskRollover" class="font-semibold text-white">۰ بار انتقال</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block mb-0.5">وضعیت مسدودی</span>
+          <span id="modalTaskBlocked" class="font-semibold text-white">خیر</span>
+        </div>
+      </div>
+
+      <!-- QA Gate Section -->
+      <div class="mb-5 bg-slate-900/40 p-4 rounded-xl border border-purple-500/20">
+        <h4 class="text-sm font-bold text-purple-300 mb-2 flex items-center gap-2">
+          <span>🛡️</span>
+          <span>پروتکل‌های آزمون اجباری کنترل کیفیت (ISO 13485 Mandatory Protocols)</span>
+        </h4>
+        <p class="text-xs text-slate-400 mb-3">
+          بر اساس معماری پیاده‌شده، این تسک تا زمانی که آخرین رکورد هر پروتکل توسط مدیر کیفیت با نتیجه Pass و امضای دیجیتال تایید نشود، هرگز به حالت Completed وارد نخواهد شد.
+        </p>
+
+        <div id="modalProtocolsList" class="space-y-2 mb-4"></div>
+
+        <!-- QA Actions -->
+        <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
+          <button onclick="submitQATest('Pass')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-3 rounded-lg transition-all flex items-center gap-1.5 shadow">
+            <span>✓</span>
+            <span>تایید آزمون با نتیجه Pass (امضای دیجیتال مدیر کیفیت)</span>
+          </button>
+          <button onclick="submitQATest('Fail')" class="bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-all">
+            <span>✗</span>
+            <span>ثبت رد آزمون (Fail)</span>
+          </button>
+          <button onclick="cancelQATest()" class="bg-amber-600/80 hover:bg-amber-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-all">
+            <span>↺</span>
+            <span>ابطال رکورد آزمون (تست تنزل رتبه به Started)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- State Transition Controls -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-700">
+        <div class="flex items-center gap-2">
+          <button onclick="toggleBlockedState()" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 px-3 rounded-lg transition">
+            ⚠️ تغییر وضعیت مسدودی (Blocked)
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="attemptCompleteTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-4 rounded-lg shadow transition">
+            تلاش برای انتقال به Completed (گیت کیفیت)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State Model mimicking Frappe / Hamerz EOMS
+    let currentFlavor = 'C'; // 'C': Tooling (Hours), 'A': Consumables (SP)
+    let currentCycle = {
+      name: "Cycle-2026-W45",
+      status: "Active",
+      baselineHours: 40.0,
+      baselinePoints: 35.0,
+      baselineFrozen: true,
+      velocityHours: 26.0,
+      velocityPoints: 24.0,
+      scopeCreepHours: 4.0,
+      scopeCreepPoints: 5.0
+    };
+
+    let tasks = [
+      {
+        id: "TASK-0101",
+        title: "فرزکاری CNC بدنه قالب سرنگ پلاسمایی",
+        team: "تیم قالب‌سازی ۲",
+        weight: 14.0,
+        category: "Completed",
+        requiresQA: true,
+        rolloverCount: 0,
+        isBlocked: false,
+        protocols: [
+          { code: "DIM-01", name: "ابعادبرداری سه بعدی CMM", result: "Pass", approver: "quality.lead@solar.ir", signature: "SHA256:d8f7e2a9b1c4" }
+        ]
+      },
+      {
+        id: "TASK-0102",
+        title: "سنگ‌زنی و پرداخت نهایی اینسرت‌ها",
+        team: "تیم قالب‌سازی ۲",
+        weight: 12.0,
+        category: "Completed",
+        requiresQA: true,
+        rolloverCount: 0,
+        isBlocked: false,
+        protocols: [
+          { code: "ROUGH-01", name: "زبری‌سنجی سطحی Ra < 0.2", result: "Pass", approver: "quality.lead@solar.ir", signature: "SHA256:5a4b3c2d1e0f" }
+        ]
+      },
+      {
+        id: "TASK-0103",
+        title: "عملیات حرارتی و سخت‌کاری موضعی سنبه",
+        team: "تیم قالب‌سازی ۲",
+        weight: 8.0,
+        category: "Started",
+        requiresQA: true,
+        rolloverCount: 1,
+        isBlocked: false,
+        protocols: [
+          { code: "HARD-01", name: "سختی‌سنجی راکول سی HRC 54-56", result: "Pending", approver: null, signature: null }
+        ]
+      },
+      {
+        id: "TASK-0104",
+        title: "سیم‌برش EDM کانال‌های خنک‌کاری",
+        team: "تیم قالب‌سازی ۲",
+        weight: 6.0,
+        category: "Started",
+        requiresQA: false,
+        rolloverCount: 2,
+        isBlocked: false,
+        protocols: []
+      },
+      {
+        id: "TASK-0105",
+        title: "تامین اینگوت تیتانیوم پزشکی Ti-6Al-4V",
+        team: "تیم قالب‌سازی ۲",
+        weight: 4.0,
+        category: "Started",
+        requiresQA: false,
+        rolloverCount: 1,
+        isBlocked: true,
+        blockedReason: "تاخیر در ترخیص گمرکی فرودگاه امام خمینی",
+        protocols: []
+      },
+      {
+        id: "TASK-0106",
+        title: "مونتاژ و تست نشتی هیدرولیک قالب",
+        team: "تیم قالب‌سازی ۲",
+        weight: 10.0,
+        category: "Unstarted",
+        requiresQA: true,
+        rolloverCount: 0,
+        isBlocked: false,
+        protocols: [
+          { code: "LEAK-01", name: "تست نشتی هیدروستاتیک ۲۰۰ بار", result: "Pending", approver: null, signature: null }
+        ]
+      }
+    ];
+
+    let selectedTaskId = null;
+
+    function renderBoard() {
+      const colUnstarted = document.getElementById("colUnstarted");
+      const colStarted = document.getElementById("colStarted");
+      const colQA = document.getElementById("colQA");
+      const colCompleted = document.getElementById("colCompleted");
+
+      colUnstarted.innerHTML = "";
+      colStarted.innerHTML = "";
+      colQA.innerHTML = "";
+      colCompleted.innerHTML = "";
+
+      let countUnstarted = 0;
+      let countStarted = 0;
+      let countQA = 0;
+      let countCompleted = 0;
+
+      tasks.forEach(t => {
+        const card = document.createElement("div");
+        card.className = "bg-slate-900 border border-slate-700/80 hover:border-indigo-500 rounded-xl p-3.5 shadow-sm cursor-pointer transition-all hover:scale-[1.01] hover:shadow-md";
+        card.onclick = () => openTaskModal(t.id);
+
+        const unit = currentFlavor === 'C' ? 'ساعت' : 'SP';
+
+        let blockedBadge = t.isBlocked ? `<span class="badge bg-rose-500/20 text-rose-300 border border-rose-500/30">⚠️ مسدود (Blocked)</span>` : '';
+        let qaBadge = t.requiresQA ? `<span class="badge bg-purple-500/20 text-purple-300">QA Gate</span>` : '';
+        let rolloverBadge = t.rolloverCount > 0 ? `<span class="badge bg-amber-500/20 text-amber-300">انتقال: ${t.rolloverCount}</span>` : '';
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1.5 font-mono">
+            <span>${t.id}</span>
+            <div class="flex items-center gap-1">${blockedBadge}${qaBadge}${rolloverBadge}</div>
+          </div>
+          <h4 class="text-sm font-semibold text-slate-100 mb-2 leading-relaxed">${t.title}</h4>
+          <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
+            <span>${t.weight} ${unit}</span>
+            <span class="text-slate-500">${t.team}</span>
+          </div>
+        `;
+
+        if (t.category === 'Completed') {
+          colCompleted.appendChild(card);
+          countCompleted++;
+        } else if (t.category === 'Unstarted') {
+          colUnstarted.appendChild(card);
+          countUnstarted++;
+        } else {
+          // Started tasks: if requiresQA and not all pass -> highlight in QA column if under test
+          const hasPendingQA = t.requiresQA && t.protocols.length > 0;
+          if (hasPendingQA) {
+            colQA.appendChild(card);
+            countQA++;
+          } else {
+            colStarted.appendChild(card);
+            countStarted++;
+          }
+        }
+      });
+
+      document.getElementById("countUnstarted").textContent = countUnstarted;
+      document.getElementById("countStarted").textContent = countStarted;
+      document.getElementById("countQA").textContent = countQA;
+      document.getElementById("countCompleted").textContent = countCompleted;
+    }
+
+    function openTaskModal(taskId) {
+      selectedTaskId = taskId;
+      const t = tasks.find(x => x.id === taskId);
+      if (!t) return;
+
+      document.getElementById("modalTaskCode").textContent = t.id;
+      document.getElementById("modalTaskTitle").textContent = t.title;
+      document.getElementById("modalTaskCategory").textContent = t.category;
+      document.getElementById("modalTaskTeam").textContent = t.team;
+      document.getElementById("modalTaskWeight").textContent = `${t.weight} ${currentFlavor === 'C' ? 'ساعت ماشین' : 'استوری پوینت'}`;
+      document.getElementById("modalTaskRollover").textContent = `${t.rolloverCount} بار انتقال`;
+      document.getElementById("modalTaskBlocked").textContent = t.isBlocked ? `بله (${t.blockedReason || 'علت نامشخص'})` : 'خیر';
+
+      const pList = document.getElementById("modalProtocolsList");
+      pList.innerHTML = "";
+
+      if (!t.requiresQA) {
+        pList.innerHTML = `<p class="text-xs text-slate-500 italic">این تسک به آزمون اجباری کنترل کیفیت نیاز ندارد.</p>`;
+      } else if (t.protocols.length === 0) {
+        pList.innerHTML = `<p class="text-xs text-rose-400 font-semibold">⚠️ خطا: تیک QA دارد ولی جدول پروتکل‌ها خالی است! طبق معماری v1.4.6 عبور از گیت مسدود است.</p>`;
+      } else {
+        t.protocols.forEach(p => {
+          let statusBadge = '';
+          if (p.result === 'Pass') {
+            statusBadge = `<span class="badge bg-emerald-500/20 text-emerald-300">پاس شد (Pass)</span>`;
+          } else if (p.result === 'Fail') {
+            statusBadge = `<span class="badge bg-rose-500/20 text-rose-300">رد شد (Fail)</span>`;
+          } else {
+            statusBadge = `<span class="badge bg-slate-700 text-slate-300">در انتظار تست</span>`;
+          }
+
+          const div = document.createElement("div");
+          div.className = "bg-slate-800 p-2.5 rounded-lg border border-slate-700 flex items-center justify-between text-xs";
+          div.innerHTML = `
+            <div>
+              <span class="font-mono font-bold text-slate-200 ml-2">${p.code}</span>
+              <span class="text-slate-300">${p.name}</span>
+              ${p.approver ? `<div class="text-[11px] text-slate-500 mt-1">امضا: ${p.signature} توسط ${p.approver}</div>` : ''}
+            </div>
+            <div>${statusBadge}</div>
+          `;
+          pList.appendChild(div);
+        });
+      }
+
+      document.getElementById("taskModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("taskModal").classList.add("hidden");
+      selectedTaskId = null;
+    }
+
+    function submitQATest(result) {
+      if (!selectedTaskId) return;
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (!t || !t.requiresQA || t.protocols.length === 0) {
+        showToast("تسک انتخابی پروتکل آزمونی برای ثبت نتیجه ندارد.", "error");
+        return;
+      }
+
+      t.protocols.forEach(p => {
+        p.result = result;
+        p.approver = result === 'Pass' ? "quality.lead@solar.ir" : null;
+        p.signature = result === 'Pass' ? "SHA256:7f9c2d1e0a8b..." : null;
+      });
+
+      showToast(`آزمون کنترل کیفیت برای تسک ${t.id} با نتیجه ${result} و هش امنیتی ثبت شد.`, result === 'Pass' ? 'success' : 'error');
+      openTaskModal(t.id);
+      renderBoard();
+    }
+
+    function cancelQATest() {
+      if (!selectedTaskId) return;
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (!t) return;
+
+      t.protocols.forEach(p => {
+        p.result = "Pending";
+        p.approver = null;
+        p.signature = null;
+      });
+
+      if (t.category === 'Completed') {
+        t.category = 'Started';
+        showToast(`تست قبلی ابطال گردید. تسک ${t.id} از حالت Completed به Started تنزل رتبه (Demote) یافت!`, "warning");
+      } else {
+        showToast(`رکورد آزمون ابطال و به وضعیت Pending بازگشت.`, "info");
+      }
+
+      openTaskModal(t.id);
+      renderBoard();
+    }
+
+    function toggleBlockedState() {
+      if (!selectedTaskId) return;
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (!t) return;
+
+      t.isBlocked = !t.isBlocked;
+      t.blockedReason = t.isBlocked ? "توقف به دلیل بررسی تلرانس‌های فنی" : "";
+      showToast(`وضعیت مسدودی تسک ${t.id} به ${t.isBlocked ? 'مسدود (Blocked)' : 'آزاد'} تغییر یافت.`, "info");
+      openTaskModal(t.id);
+      renderBoard();
+    }
+
+    function attemptCompleteTask() {
+      if (!selectedTaskId) return;
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (!t) return;
+
+      if (t.requiresQA) {
+        if (!t.protocols || t.protocols.length === 0) {
+          showToast(`گیت کیفیت مسدود کرد: تسک دارای تیک QA است اما هیچ پروتکل اجباری تعریف نشده!`, "error");
+          return;
+        }
+        const unpassed = t.protocols.filter(p => p.result !== 'Pass');
+        if (unpassed.length > 0) {
+          showToast(`گیت کیفیت مسدود کرد: ${unpassed.length} پروتکل هنوز تاییدیه Pass مدیر کیفیت را دریافت نکرده‌اند!`, "error");
+          return;
+        }
+      }
+
+      t.category = "Completed";
+      showToast(`تسک ${t.id} با موفقیت از گیت کیفیت عبور کرد و به وضعیت Completed وارد و قفل شد (Done-Lock)!`, "success");
+      closeModal();
+      renderBoard();
+    }
+
+    function triggerRolloverSimulation() {
+      showToast("در حال اجرای موتور رول‌اور اتمیک شبانه (execute_cycle_rollover)...", "info");
+
+      setTimeout(() => {
+        let rolledCount = 0;
+        let blockedCarried = 0;
+        let evictedCount = 0;
+
+        tasks.forEach(t => {
+          if (t.category === 'Completed') {
+            // Remains completed in this cycle
+          } else if (t.isBlocked) {
+            // Blocked task rolls forward WITHOUT incrementing rollover counter!
+            blockedCarried++;
+          } else if (t.category === 'Started' && t.rolloverCount >= 2) {
+            // Third rollover of started task stays started with review required
+            t.rolloverCount++;
+            rolledCount++;
+          } else if (t.category === 'Unstarted' && t.rolloverCount >= 2) {
+            // Third rollover of unstarted task evicts to backlog
+            t.category = 'Unstarted';
+            t.rolloverCount++;
+            evictedCount++;
+          } else {
+            // Standard rollover
+            t.rolloverCount++;
+            rolledCount++;
+          }
+        });
+
+        currentCycle.name = "Cycle-2026-W46 (چرخه بعدی)";
+        document.getElementById("cycleName").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span>${currentCycle.name}`;
+
+        showToast(
+          `رول‌اور با موفقیت اجرا شد! ${rolledCount} تسک به چرخه جدید منتقل شدند، ${blockedCarried} تسک مسدود بدون جریمه منتقل گردید و سایکل قبلی تکمیل و بایگانی شد.`,
+          "success"
+        );
+        renderBoard();
+      }, 700);
+    }
+
+    function switchFlavor(flavor) {
+      currentFlavor = flavor;
+      const btnC = document.getElementById("btnFlavorC");
+      const btnA = document.getElementById("btnFlavorA");
+
+      if (flavor === 'C') {
+        btnC.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all shadow-sm";
+        btnA.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all";
+        document.getElementById("baselineScope").innerHTML = "🔒 ۴۰.۰ ساعت ماشین";
+        document.getElementById("completedVelocity").innerHTML = "۲۶.۰ ساعت (۶۵٪)";
+        document.getElementById("scopeCreep").innerHTML = "+۴.۰ ساعت (+۱۰٪)";
+      } else {
+        btnA.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all shadow-sm";
+        btnC.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all";
+        document.getElementById("baselineScope").innerHTML = "🔒 ۳۵.۰ استوری پوینت";
+        document.getElementById("completedVelocity").innerHTML = "۲۴.۰ استوری پوینت (۶۸٪)";
+        document.getElementById("scopeCreep").innerHTML = "+۵.۰ استوری پوینت (+۱۴٪)";
+      }
+      renderBoard();
+    }
+
+    function resetDemoData() {
+      location.reload();
+    }
+
+    function showToast(message, type) {
+      const toast = document.getElementById("statusToast");
+      toast.classList.remove("hidden", "bg-emerald-950/60", "text-emerald-200", "border-emerald-500/40", "bg-rose-950/60", "text-rose-200", "border-rose-500/40", "bg-amber-950/60", "text-amber-200", "border-amber-500/40", "bg-slate-800", "text-slate-200", "border-slate-700");
+
+      if (type === 'success') {
+        toast.classList.add("bg-emerald-950/60", "text-emerald-200", "border-emerald-500/40");
+      } else if (type === 'error') {
+        toast.classList.add("bg-rose-950/60", "text-rose-200", "border-rose-500/40");
+      } else if (type === 'warning') {
+        toast.classList.add("bg-amber-950/60", "text-amber-200", "border-amber-500/40");
+      } else {
+        toast.classList.add("bg-slate-800", "text-slate-200", "border-slate-700");
+      }
+
+      toast.textContent = message;
+      toast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Initial render
+    renderBoard();
+  </script>
+</body>
+</html>
