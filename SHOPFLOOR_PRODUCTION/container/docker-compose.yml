@@ -1,0 +1,22 @@
+services:
+  shopfloor:
+    build:
+      context: ../code
+      dockerfile: Dockerfile
+
+    container_name: hamerz_shopfloor_demo
+    restart: unless-stopped
+
+    user: "${PUID}:${PGID}"
+
+    environment:
+      PORT: "8091"
+      PYTHONUNBUFFERED: "1"
+
+    volumes:
+      - ../code:/app
+      - ../code/hamerz_shopfloor.db:/app/hamerz_shopfloor.db
+      - ../code/uploads:/app/uploads
+
+    ports:
+      - "127.0.0.1:8091:8091"

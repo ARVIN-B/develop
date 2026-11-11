@@ -1,0 +1,172 @@
+[
+  {
+    "name": "Task-custom_team",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_team",
+    "fieldtype": "Link",
+    "insert_after": "project",
+    "label": "Work Team",
+    "options": "Work Team"
+  },
+  {
+    "name": "Task-custom_cycle",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_cycle",
+    "fieldtype": "Link",
+    "insert_after": "custom_team",
+    "label": "Work Cycle",
+    "options": "Work Cycle"
+  },
+  {
+    "name": "Task-custom_task_lead",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_task_lead",
+    "fieldtype": "Link",
+    "insert_after": "custom_cycle",
+    "label": "Task Lead (Owner)",
+    "options": "User"
+  },
+  {
+    "name": "Task-custom_state_category",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_state_category",
+    "fieldtype": "Select",
+    "insert_after": "status",
+    "label": "State Category (Linear Model)",
+    "options": "Triage\nBacklog\nUnstarted\nStarted\nCompleted\nCancelled"
+  },
+  {
+    "name": "Task-custom_story_points",
+    "default": "0",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_story_points",
+    "fieldtype": "Float",
+    "insert_after": "custom_state_category",
+    "label": "Story Points"
+  },
+  {
+    "name": "Task-custom_machine_hours",
+    "default": "0",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_machine_hours",
+    "fieldtype": "Float",
+    "insert_after": "custom_story_points",
+    "label": "Machine Hours (Tooling)"
+  },
+  {
+    "name": "Task-custom_rollover_count",
+    "default": "0",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_rollover_count",
+    "fieldtype": "Int",
+    "insert_after": "custom_machine_hours",
+    "label": "Rollover Count",
+    "read_only": 1
+  },
+  {
+    "name": "Task-custom_entered_via_rollover",
+    "default": "0",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_entered_via_rollover",
+    "fieldtype": "Check",
+    "insert_after": "custom_rollover_count",
+    "label": "Entered Via Rollover",
+    "read_only": 1
+  },
+  {
+    "name": "Task-custom_is_blocked",
+    "default": "0",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_is_blocked",
+    "fieldtype": "Check",
+    "insert_after": "custom_entered_via_rollover",
+    "label": "Is Blocked"
+  },
+  {
+    "name": "Task-custom_blocked_reason",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_blocked_reason",
+    "fieldtype": "Small Text",
+    "insert_after": "custom_is_blocked",
+    "label": "Blocked Reason"
+  },
+  {
+    "name": "Task-custom_needs_review",
+    "default": "0",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_needs_review",
+    "fieldtype": "Check",
+    "insert_after": "custom_blocked_reason",
+    "label": "Needs PM/QA Review"
+  },
+  {
+    "name": "Task-custom_reopen_reason",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_reopen_reason",
+    "fieldtype": "Small Text",
+    "insert_after": "custom_needs_review",
+    "label": "Reopen Justification"
+  },
+  {
+    "name": "Task-custom_requires_qa_gate",
+    "default": "0",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_requires_qa_gate",
+    "fieldtype": "Check",
+    "insert_after": "custom_reopen_reason",
+    "label": "Requires QA Gate Protocol"
+  },
+  {
+    "name": "Task-custom_cycle_added_at",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_cycle_added_at",
+    "fieldtype": "Datetime",
+    "insert_after": "custom_requires_qa_gate",
+    "label": "Cycle Added At",
+    "read_only": 1
+  },
+  {
+    "name": "Task-custom_mandatory_protocols",
+    "doctype": "Custom Field",
+    "dt": "Task",
+    "fieldname": "custom_mandatory_protocols",
+    "fieldtype": "Table",
+    "insert_after": "custom_cycle_added_at",
+    "label": "Mandatory QA Protocols",
+    "options": "Task Mandatory Protocol"
+  },
+  {
+    "name": "Project-custom_requires_qa_gate",
+    "default": "0",
+    "doctype": "Custom Field",
+    "dt": "Project",
+    "fieldname": "custom_requires_qa_gate",
+    "fieldtype": "Check",
+    "insert_after": "status",
+    "label": "Strict QA Gate Enforced"
+  },
+  {
+    "name": "Project-custom_flavor",
+    "doctype": "Custom Field",
+    "dt": "Project",
+    "fieldname": "custom_flavor",
+    "fieldtype": "Select",
+    "insert_after": "custom_requires_qa_gate",
+    "label": "Engineering Flavor",
+    "options": "Flavor A (Medical Consumables)\nFlavor B (Plasma Devices)\nFlavor C (Tooling/Molds)\nFlavor D (Cleanroom Ops)"
+  }
+]

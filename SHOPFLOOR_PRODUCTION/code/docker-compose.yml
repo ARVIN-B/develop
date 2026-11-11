@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  hamerz-shopfloor:
+    build: .
+    container_name: hamerz_shopfloor_app
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    environment:
+      - PORT=8090
+      - FRAPPE_API_KEY=demo_api_key_hamerz
+      - FRAPPE_API_SECRET=demo_api_secret_hamerz
+    volumes:
+      - ./hamerz_shopfloor.db:/app/hamerz_shopfloor.db
+      - ./uploads:/app/uploads

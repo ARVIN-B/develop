@@ -1,0 +1,112 @@
+{
+  "actions": [],
+  "allow_rename": 0,
+  "autoname": "TCH-.#####",
+  "creation": "2026-11-10 12:00:00.000000",
+  "doctype": "DocType",
+  "editable_grid": 0,
+  "engine": "InnoDB",
+  "field_order": [
+    "task",
+    "from_cycle",
+    "to_cycle",
+    "event_type",
+    "rollover_count",
+    "is_blocked",
+    "reason",
+    "execution_id",
+    "moved_at"
+  ],
+  "fields": [
+    {
+      "fieldname": "task",
+      "fieldtype": "Link",
+      "label": "Task",
+      "options": "Task",
+      "reqd": 1
+    },
+    {
+      "fieldname": "from_cycle",
+      "fieldtype": "Link",
+      "label": "Source Cycle",
+      "options": "Work Cycle"
+    },
+    {
+      "fieldname": "to_cycle",
+      "fieldtype": "Link",
+      "label": "Destination Cycle",
+      "options": "Work Cycle"
+    },
+    {
+      "fieldname": "event_type",
+      "fieldtype": "Select",
+      "label": "Event Type",
+      "options": "Rollover\nBlocked\nReview Required\nEviction\nUnscheduled\nManual Transfer",
+      "reqd": 1
+    },
+    {
+      "default": "0",
+      "fieldname": "rollover_count",
+      "fieldtype": "Int",
+      "label": "Rollover Count"
+    },
+    {
+      "default": "0",
+      "fieldname": "is_blocked",
+      "fieldtype": "Check",
+      "label": "Is Blocked"
+    },
+    {
+      "fieldname": "reason",
+      "fieldtype": "Small Text",
+      "label": "Transition Reason"
+    },
+    {
+      "fieldname": "execution_id",
+      "fieldtype": "Data",
+      "label": "Execution Run ID"
+    },
+    {
+      "fieldname": "moved_at",
+      "fieldtype": "Datetime",
+      "label": "Timestamp"
+    }
+  ],
+  "links": [],
+  "modified": "2026-11-10 12:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "EOMS",
+  "name": "Task Cycle History",
+  "naming_rule": "Expression (old style)",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 0,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    },
+    {
+      "create": 0,
+      "delete": 0,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Projects User",
+      "share": 0,
+      "write": 0
+    }
+  ],
+  "sort_field": "moved_at",
+  "sort_order": "DESC",
+  "states": [],
+  "track_changes": 1
+}

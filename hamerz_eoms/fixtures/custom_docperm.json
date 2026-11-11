@@ -1,0 +1,23 @@
+[
+  {
+    "doctype": "Custom DocPerm",
+    "name": "Task-Quality Manager-0",
+    "parent": "Task",
+    "parenttype": "DocType",
+    "parentfield": "permissions",
+    "role": "Quality Manager",
+    "permlevel": 0,
+    "read": 1,
+    "write": 1,
+    "create": 1,
+    "delete": 0,
+    "submit": 0,
+    "cancel": 0,
+    "amend": 0,
+    "export": 1,
+    "print": 1,
+    "email": 1,
+    "report": 1,
+    "share": 1
+  }
+]

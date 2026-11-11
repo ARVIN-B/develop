@@ -1,0 +1,164 @@
+{
+  "actions": [],
+  "allow_rename": 0,
+  "autoname": "ETR-.#####",
+  "creation": "2026-11-10 12:00:00.000000",
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "task",
+    "protocol_code",
+    "protocol_name",
+    "result",
+    "section_compliance",
+    "tested_by",
+    "qa_approver",
+    "test_date",
+    "sample_id",
+    "equipment_id",
+    "submitted_at",
+    "approval_signature",
+    "amended_from"
+  ],
+  "fields": [
+    {
+      "fieldname": "task",
+      "fieldtype": "Link",
+      "label": "Task",
+      "options": "Task",
+      "reqd": 1
+    },
+    {
+      "fieldname": "protocol_code",
+      "fieldtype": "Data",
+      "label": "Protocol Code",
+      "reqd": 1
+    },
+    {
+      "fieldname": "protocol_name",
+      "fieldtype": "Data",
+      "label": "Protocol Name",
+      "reqd": 1
+    },
+    {
+      "fieldname": "result",
+      "fieldtype": "Select",
+      "label": "Result",
+      "options": "Pass\nFail",
+      "reqd": 1
+    },
+    {
+      "fieldname": "section_compliance",
+      "fieldtype": "Section Break",
+      "label": "Segregation of Duties & Traceability"
+    },
+    {
+      "fieldname": "tested_by",
+      "fieldtype": "Link",
+      "label": "Tested By (Operator)",
+      "options": "User",
+      "reqd": 1
+    },
+    {
+      "fieldname": "qa_approver",
+      "fieldtype": "Link",
+      "label": "QA Approver (Quality Manager)",
+      "options": "User",
+      "reqd": 1
+    },
+    {
+      "fieldname": "test_date",
+      "fieldtype": "Date",
+      "label": "Test Date",
+      "reqd": 1
+    },
+    {
+      "fieldname": "sample_id",
+      "fieldtype": "Data",
+      "label": "Sample / Batch ID"
+    },
+    {
+      "fieldname": "equipment_id",
+      "fieldtype": "Data",
+      "label": "Equipment ID / Cal. Trace"
+    },
+    {
+      "fieldname": "submitted_at",
+      "fieldtype": "Datetime",
+      "label": "Submitted At",
+      "read_only": 1
+    },
+    {
+      "fieldname": "approval_signature",
+      "fieldtype": "Data",
+      "label": "Approval Integrity Digest",
+      "read_only": 1
+    },
+    {
+      "fieldname": "amended_from",
+      "fieldtype": "Link",
+      "label": "Amended From",
+      "no_copy": 1,
+      "options": "Engineering Test Record",
+      "print_hide": 1,
+      "read_only": 1
+    }
+  ],
+  "is_submittable": 1,
+  "links": [],
+  "modified": "2026-11-10 12:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "EOMS",
+  "name": "Engineering Test Record",
+  "naming_rule": "Expression (old style)",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 0,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Quality Manager",
+      "share": 1,
+      "submit": 1,
+      "cancel": 1,
+      "write": 1
+    },
+    {
+      "create": 1,
+      "delete": 0,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Projects User",
+      "share": 0,
+      "submit": 0,
+      "cancel": 0,
+      "write": 1
+    },
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "submit": 1,
+      "cancel": 1,
+      "write": 1
+    }
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "states": [],
+  "track_changes": 1
+}
